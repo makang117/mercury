@@ -1,0 +1,18 @@
+{
+    "mysql":
+    {
+        "host" : "192.168.31.217",
+        "port" : 3306,
+        "user" : "stocker",
+        "password" : "MAkang117",
+        "db" : "stock"
+    },
+    "fundurl":
+    {
+        "sinafund" : "https://trade.xincai.com/web/goodsFund?status=&order=month_incratio&order_type=desc&tab=1&page=1"
+    },
+    "tushare":
+    {
+        "key" : "3a650db6c0e481862bfb1526a51efd95c666da22c90e6cef9b6290b2"
+    }
+}
