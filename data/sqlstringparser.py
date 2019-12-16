@@ -5,15 +5,6 @@ from conf.cfgparser import ConfigFile
 import os
 
 
-def mysql_conn_dict():
-    """
-    获取默认mysql数据库连接数据字典
-    :return:获取默认配置的mysql数据库数据连接字典
-    """
-    sp = SqlParser()
-    return sp.conn_dict()
-
-
 # SqlParse class
 class SqlParser(object):
     """
@@ -34,15 +25,15 @@ class SqlParser(object):
         构建mysql数据连接数据字典
         :return: mysql数据库连接数据字典
         """
-        _cfg = ConfigFile()
-        _cfg.config_file_path = self._cfg_path
-        _cfg_dict = _cfg.get_dict('mysql')
+        cfg = ConfigFile()
+        cfg.config_file_path = self._cfg_path
+        cfg_dict = cfg.get_dict('mysql')
         # 获取配置变量信息
-        self._host = _cfg_dict['host']
-        self._port = _cfg_dict['port']
-        self._user = _cfg_dict['user']
-        self._password = _cfg_dict['password']
-        self._db = _cfg_dict['db']
+        self._host = cfg_dict['host']
+        self._port = cfg_dict['port']
+        self._user = cfg_dict['user']
+        self._password = cfg_dict['password']
+        self._db = cfg_dict['db']
 
     def parse_conn_engine(self):
         """

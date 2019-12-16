@@ -10,7 +10,6 @@ class ConfigFile(object):
     处理系统配置文件类
     """
     def __init__(self):
-        # self._file_path = os.path.abspath('..') + "\\conf\\configfile.json"
         self._file_path = os.path.dirname(os.path.abspath(__file__)) + "\\" + self.config_file_name
 
     @property
@@ -50,7 +49,8 @@ class ConfigFile(object):
                 _load_json = json.load(f)
             return _load_json
         except Exception as err:
-            print('配置文件打开错误！', err)
+            err.args += ('配置文件打开错误！',)
+            raise
 
     def get_dict(self, key):
         """
@@ -63,7 +63,8 @@ class ConfigFile(object):
         try:
             return _json_dict[key]
         except Exception as err:
-            print('获取节点错误！', err)
+            err += ('获取节点错误！',)
+            raise
 
 
 
