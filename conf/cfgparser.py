@@ -52,16 +52,17 @@ class ConfigFile(object):
             err.args += ('配置文件打开错误！',)
             raise
 
-    def get_dict(self, key):
+    def get_dict(self, key) -> dict:
         """
         指定key，返回json字典
         :rtype: object
         :param key: 需要返回json对象的key
         :return: 根据指定的key，返回json对象
         """
-        _json_dict = self.load_file()
         try:
-            return _json_dict[key]
+            json_dict = self.load_file()
+            dict_value = json_dict[key]
+            return dict_value
         except Exception as err:
             err += ('获取节点错误！',)
             raise

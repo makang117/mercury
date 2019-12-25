@@ -57,6 +57,22 @@ class BasicData(object):
         """
         self.db_conn = value
 
+    def query_stock(self, stock_code=""):
+        try:
+            query_sql = "select * from stock_basic "
+            if stock_code.strip():
+                query_sql = query_sql + " where symbol=%(basic_code)s"
+                stock_val = {'basic_code': stock_code}
+                df_stock = self.db_conn.query_to_df(query_sql, stock_val)
+            else:
+                df_stock = self.db_conn.query_to_df(query_sql)
+            return df_stock
+        except Exception as err:
+            err.args += ("查询股票基础信息错误：", stock_code)
+            raise
+        finally:
+            self.db_conn.dispose()
+
     def import_stock(self):
         """
         导入股票基础信息
@@ -75,24 +91,23 @@ class BasicData(object):
             stock_list['list_date'] = pd.to_datetime(stock_list['list_date'])
             stock_list['delist_date'] = pd.to_datetime(stock_list['delist_date'])
             # 转换股票列表DataFrame的上市时间、退市时间列数据类型
-
-            last_date = self.db_conn.query_sql_one('select max(stock_basic.list_date) from stock_basic')
+            max_date_sql = 'select max(stock_basic.list_date) from stock_basic'
+            last_date = self.db_conn.query_sql_one(max_date_sql)
             # 获取数据库中股票列表最新的上市股票日期
             if not(last_date is None):  # 如果时间不为空，对比数据库和股票列表数据
                 last_date = datetime.datetime.strftime(last_date, '%Y-%m-%d')
                 mask = (stock_list['list_date'] > last_date)
                 stock_list = stock_list.loc[mask]  # 过滤股票数据，选择最新的股票信息
             _real_num = stock_list.shape[0]
-            insert_num = 0
             if _real_num > 0:
                 self.db_conn.insert_from_df(stock_list, 'stock_basic')
-            insert_num = _real_num  # 如果导入成功，获取导入数据的数量
+            return _real_num  # 导入成功,返回插入股票信息的数量
         except Exception as err:
             err.args += ("导入股票基础数据错误",)
             raise
         finally:
             self.db_conn.dispose()
-            return insert_num  # 返回插入股票信息的数量
+
 
 
 
