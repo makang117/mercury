@@ -13,49 +13,34 @@ tushare 对象操作类；主要包括初始化tushare参数、获取tushuare接
 import tushare as ts
 from conf.cfgparser import ConfigFile
 from . import constants
+import pandas as pd
 
 
 class TushareObject(object):
     """
     Tushare 对象操作类，获取和操作Tushare接口
     """
-
     def __init__(self):
-        self._key = ""
-        self._ts_pro_object = None
+        cfg = ConfigFile()
+        tushare_conf = cfg.get_dict(constants.TUSHARE_KEY)
+        self.key = tushare_conf["key"]
+        ts.set_token(self.key)
+        self.ts_pro = ts.pro_api()
 
-    @staticmethod
-    def _get_key():
-        """
-        获取tushare的key
-        :return:
-        """
-        _cfg = ConfigFile()
-        tushare_conf = _cfg.get_dict(constants.TUSHARE_KEY)
-        return tushare_conf["key"]
+    def query_stock_list(self):
+        try:
+            # 从接口中获取最新的股票基础数据
+            stock_list = self.ts_pro.query('stock_basic', exchange='', fields='ts_code, symbol, name, area, industry,\
+                           fullname, enname, market, exchange, curr_type, list_status, list_date, delist_date, is_hs')
 
-    @property
-    def key(self):
-        """
-        获取tushare接口key值
-        :return: 接口key值
-        """
-        if not self._key.strip():
-            self._key = self._get_key()
-        return self._key
+            # 修改接口中的列名称，保持和数据库的列名称相同
+            stock_list.rename(columns={'ts_code': 'basic_code', 'name': 'stock_name', 'fullname': 'full_name',
+                                       'enname': 'en_name'}, inplace=True)
 
-    def get_pro_object(self):
-        """
-        获取tushare pro接口对象
-        :return:
-        """
-        if not self._ts_pro_object:
-            ts.set_token(self.key)
-            self._ts_pro_object = ts.pro_api()
-        return self._ts_pro_object
-
-
-
-
-
-
+            # 转换股票列表DataFrame的上市时间、退市时间列数据类型
+            stock_list['list_date'] = pd.to_datetime(stock_list['list_date'])
+            stock_list['delist_date'] = pd.to_datetime(stock_list['delist_date'])
+            return stock_list
+        except Exception as err:
+            err.args += ("tushare接口获取股票列表错误", err)
+            raise

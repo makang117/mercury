@@ -13,6 +13,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy import engine
+from sqlalchemy import text
 from data.sqlstringparser import SqlParser
 from pandas import DataFrame
 import pandas as pd
@@ -88,37 +89,43 @@ class DataOperator(object):
             self.create_db_engine()
         df.to_sql(table_name, self.db_engine, index=False, if_exists='append')
 
-    def query_sql_one(self, sql):
+    def query_sql_one(self, sql, params=None):
         """
-        查询sql语句，返回一个结果
-        :param sql:
+        查询sql语句，返回第一行第一列结果
+        :param sql:执行的SQL语句
+        :param params:参数列表
         :return:返回第一行第一列数据
         """
-        result = self.execute_sql(sql)
+        result = self.execute_sql(sql, params)
         row_value = result.scalar()
         return row_value
 
-    def query_to_df(self, sql, var_value):
+    def query_to_df(self, sql, var_value=None):
         """
-        查询数据，
-        :param sql:
-        :param var_value:
-        :return:
+        查询数据，返回DataFrame
+        :param sql:查询sql语句
+        :param var_value:参数列表，默认None
+        :return:包含数据结果的DataFrame
         """
         try:
-            data_df = pd.read_sql_query(sql, self.db_engine, params=var_value)
+            data_df = pd.read_sql_query(text(sql), self.db_engine, params=var_value)
             return data_df
         except Exception as err:
             err.args += ("error in data_operator.query_to_df() function:", sql, var_value)
             raise
 
-    def execute_sql(self, sql) -> engine.result.ResultProxy:
+    def execute_sql(self, sql, params=None) -> engine.result.ResultProxy:
         """
-        执行SQL语句
-        :param sql:
-        :return:
+        执行sql语句
+        :param sql:SQL语句
+        :param params: SQL参数列表
+        :return: 返回执行结果
         """
-        return self.db_conn.execute(sql)
+        try:
+            return self.db_conn.execute(text(sql), params)
+        except Exception as err:
+            err.args += ("error in data_operator.execute_sql() function:", sql, params)
+            raise
 
     def dispose(self):
         """
