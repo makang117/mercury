@@ -87,7 +87,11 @@ class DataOperator(object):
         """
         if not self.db_engine:
             self.create_db_engine()
-        df.to_sql(table_name, self.db_engine, index=False, if_exists='append')
+        try:
+            df.to_sql(table_name, self.db_engine, index=False, if_exists='append')
+        except Exception as err:
+            err.args += ("error in data_operator.insert_from_sql() function", table_name)
+            raise
 
     def query_sql_one(self, sql, params=None):
         """
@@ -122,7 +126,10 @@ class DataOperator(object):
         :return: 返回执行结果
         """
         try:
-            return self.db_conn.execute(text(sql), params)
+            if params is None:
+                return self.db_conn.execute(sql)
+            else:
+                return self.db_conn.execute(text(sql), params)
         except Exception as err:
             err.args += ("error in data_operator.execute_sql() function:", sql, params)
             raise
