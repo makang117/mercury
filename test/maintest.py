@@ -81,7 +81,7 @@ def test_import_stock():
 if __name__ == "__main__":
     # test_conf()
     # test_ts()
-    # test_import_stock()
+    test_import_stock()
     test_import_daily()
     # test_log()
     # test_sql_string()

@@ -17,7 +17,7 @@ class SqlParser(object):
     _db = ""
 
     def __init__(self):
-        self._cfg_path = os.path.abspath('..') + "\\conf\\configfile.json"
+        self._cfg_path = os.path.abspath('..') + "/conf/configfile.json"
         self._get_db_cnf()
 
     def _get_db_cnf(self):

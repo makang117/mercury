@@ -10,7 +10,7 @@ class ConfigFile(object):
     处理系统配置文件类
     """
     def __init__(self):
-        self._file_path = os.path.dirname(os.path.abspath(__file__)) + "\\" + self.config_file_name
+        self._file_path = os.path.dirname(os.path.abspath(__file__)) + "/" + self.config_file_name
 
     @property
     def config_file_name(self):

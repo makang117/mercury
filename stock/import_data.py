@@ -80,15 +80,16 @@ class BasicData(object):
                 # 获取最新的交易日期
                 last_daily = self.get_last_daily(basic_code)
                 if last_daily is None:
-                    self.import_stock_daily(basic_code)
+                    # self.import_stock_daily(basic_code)
+                    start_date = datetime(2017, 1, 1)
                 else:
                     # 开始日期推后一天
                     start_date = last_daily + datetime.timedelta(days=1)
                     # 结束日期设置为当前日期
-                    end_date = datetime.date.today()
-                    # 导入股票日线行情，交易日期大于当前系统最新的交易日期
-                    self.import_stock_daily(basic_code, start_date, end_date)
-                time.sleep(1)
+                end_date = datetime.date.today()
+                # 导入股票日线行情，交易日期大于当前系统最新的交易日期
+                self.import_stock_daily(basic_code, start_date, end_date)
+                # time.sleep(1)
             return stock_df.shape[0]
         except Exception as err:
             err.args += ("导入股票日线行情错误", err)
